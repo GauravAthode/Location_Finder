@@ -1,5 +1,11 @@
+const mapContainer = document.getElementById("mapContainer");
+const stateSelect = document.getElementById("stateSelect");
+const clickSound = document.getElementById("clickSound");
+const soundBtn = document.getElementById("soundBtn");
+
+
 const statesData = [
-  { name: "Andhra Pradesh", top: 70, left: 40 },
+  { name: "Andhra Pradesh", top: 75, left: 45 },
   { name: "Arunachal Pradesh", top: 20, left: 88 },
   { name: "Assam", top: 25, left: 82 },
   { name: "Bihar", top: 35, left: 65 },
@@ -31,8 +37,7 @@ const statesData = [
   { name: "West Bengal", top: 40, left: 70 },
 ];
 
-const mapContainer = document.getElementById("mapContainer");
-const stateSelect = document.getElementById("stateSelect");
+let isSoundOn = true;
 
 window.onload = function () {
   statesData.forEach((state) => {
@@ -43,33 +48,58 @@ window.onload = function () {
   });
 };
 
+function playSound() {
+  if (isSoundOn) {
+    clickSound.currentTime = 0;
+    clickSound.play().catch((error) => console.log(error));
+  }
+}
+
+function toggleSound() {
+  isSoundOn = !isSoundOn;
+  if (isSoundOn) {
+    soundBtn.innerText = "🔊 On";
+    soundBtn.classList.remove("btn-secondary");
+    soundBtn.classList.add("btn-warning");
+    playSound();
+  } else {
+    soundBtn.innerText = "🔇 Off";
+    soundBtn.classList.remove("btn-warning");
+    soundBtn.classList.add("btn-secondary");
+  }
+}
+
 function createMarker(state) {
-  const marker = document.createElement("div");
+  const marker = document.createElement("i");
 
-  marker.className =
-    "position-absolute translate-middle rounded-circle bg-success border border-2 border-white";
-  marker.title = state.name;
+  marker.className = "bi bi-flag-fill text-danger position-absolute fs-5";
+  marker.title = state.name; // Used to identify duplicates
 
-  marker.style.width = "20px";
-  marker.style.height = "20px";
   marker.style.top = state.top + "%";
   marker.style.left = state.left + "%";
+  marker.style.transform = "translateY(-90%)";
   marker.style.cursor = "pointer";
+  marker.style.textShadow = "1px 1px 2px rgba(0,0,0,0.3)";
 
   marker.onmouseover = () => {
-    marker.classList.remove("bg-success");
-    marker.classList.add("bg-danger");
+    marker.classList.remove("text-danger");
+    marker.classList.add("text-warning");
   };
   marker.onmouseout = () => {
-    marker.classList.remove("bg-danger");
-    marker.classList.add("bg-success");
+    marker.classList.remove("text-warning");
+    marker.classList.add("text-danger");
   };
-  marker.onclick = () => alert(state.name);
+
+  marker.onclick = () => {
+    playSound();
+    alert(state.name);
+  };
 
   return marker;
 }
 
 function clearAll() {
+  playSound();
   const children = Array.from(mapContainer.children);
   children.forEach((child) => {
     if (child.tagName !== "IMG") {
@@ -80,6 +110,7 @@ function clearAll() {
 }
 
 function addAll() {
+  playSound();
   clearAll();
   statesData.forEach((state) => {
     const marker = createMarker(state);
@@ -88,19 +119,24 @@ function addAll() {
 }
 
 function handleDropdownChange() {
+  playSound();
   const selectedName = stateSelect.value;
+
   if (selectedName === "none") {
-    clearAll();
     return;
   }
-  clearAll();
+  const existingMarkers = Array.from(mapContainer.children);
+  const alreadyExists = existingMarkers.some(
+    (child) => child.title === selectedName
+  );
+
+  if (alreadyExists) {
+  
+    return;
+  }
   const state = statesData.find((s) => s.name === selectedName);
   if (state) {
     const marker = createMarker(state);
     mapContainer.appendChild(marker);
   }
-}
-
-function toggleSound() {
-  alert("Sound functionality placeholder");
 }
