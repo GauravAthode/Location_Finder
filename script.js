@@ -2,10 +2,11 @@ const mapContainer = document.getElementById("mapContainer");
 const stateSelect = document.getElementById("stateSelect");
 const clickSound = document.getElementById("clickSound");
 const soundBtn = document.getElementById("soundBtn");
-
+const mapImage = document.getElementById("mapImage");
+const mapType = document.getElementById("mapType");
 
 const statesData = [
-  { name: "Andhra Pradesh", top: 66, left: 42},
+  { name: "Andhra Pradesh", top: 66, left: 42 },
   { name: "Arunachal Pradesh", top: 33, left: 82 },
   { name: "Assam", top: 37, left: 77 },
   { name: "Bihar", top: 39, left: 58 },
@@ -15,7 +16,7 @@ const statesData = [
   { name: "Gujarat", top: 45, left: 18 },
   { name: "Haryana", top: 29, left: 31 },
   { name: "Himachal Pradesh", top: 14, left: 36 },
-  { name: "Jammu & Kashmir", top: 17, left: 28},
+  { name: "Jammu & Kashmir", top: 17, left: 28 },
   { name: "Jharkhand", top: 46, left: 57 },
   { name: "Karnataka", top: 76, left: 32 },
   { name: "Kerala", top: 89, left: 30 },
@@ -37,16 +38,60 @@ const statesData = [
   { name: "West Bengal", top: 48, left: 66 },
 ];
 
+const continentsData = [
+
+  { name: "Africa", top: 62, left: 52 },
+  { name: "Antarctica", top: 97, left: 63 },
+  { name: "Asia", top: 45, left: 73 },
+  { name: "Australia", top: 73, left: 85 },
+  { name: "Europe", top: 42, left: 53 },
+  { name: "North America", top: 35, left: 18 },
+  { name: "South America", top: 70, left: 30 },
+  
+  
+  
+];
+
 let isSoundOn = true;
+let currentData = statesData;
 
 window.onload = function () {
-  statesData.forEach((state) => {
+  loadMapData();
+};
+
+function switchMapMode() {
+  playSound();
+  clearAll();
+  const selectedMode = mapType.value;
+
+  if (selectedMode === "world") {
+    mapImage.src = "WorldMap.jpg";
+    currentData = continentsData;
+    stateSelect.innerHTML = '<option value="none">---Select continents---</option>';
+    // world flag
+    stateSelect.style.background="linear-gradient(90deg, #00008B 0%, #FFFFFF 50%, #008000 100%)";
+    stateSelect.style.color="#000000";
+    
+  } else {
+    mapImage.src = "map.jpg";
+    currentData = statesData;
+    stateSelect.innerHTML = '<option value="none">---Select States---</option>';
+    // india flag
+    stateSelect.style.background="linear-gradient(90deg, #FF9933 0%, #FFFFFF 50%, #138808 100%)";
+    stateSelect.style.color="#000000";
+  }
+
+  loadMapData();
+}
+
+function loadMapData() {
+  currentData.forEach((item) => {
     const option = document.createElement("option");
-    option.value = state.name;
-    option.innerText = state.name;
+    option.value = item.name;
+    option.innerText = item.name;
     stateSelect.appendChild(option);
   });
-};
+}
 
 function playSound() {
   if (isSoundOn) {
@@ -69,14 +114,14 @@ function toggleSound() {
   }
 }
 
-function createMarker(state) {
+function createMarker(item) {
   const marker = document.createElement("i");
 
   marker.className = "bi bi-flag-fill text-danger position-absolute fs-5";
-  marker.title = state.name; // Used to identify duplicates
+  marker.title = item.name;
 
-  marker.style.top = state.top + "%";
-  marker.style.left = state.left + "%";
+  marker.style.top = item.top + "%";
+  marker.style.left = item.left + "%";
   marker.style.transform = "translateY(-90%)";
   marker.style.cursor = "pointer";
   marker.style.textShadow = "1px 1px 2px rgba(0,0,0,0.3)";
@@ -92,7 +137,7 @@ function createMarker(state) {
 
   marker.onclick = () => {
     playSound();
-    alert(state.name);
+    alert(item.name);
   };
 
   return marker;
@@ -112,8 +157,8 @@ function clearAll() {
 function addAll() {
   playSound();
   clearAll();
-  statesData.forEach((state) => {
-    const marker = createMarker(state);
+  currentData.forEach((item) => {
+    const marker = createMarker(item);
     mapContainer.appendChild(marker);
   });
 }
@@ -131,12 +176,11 @@ function handleDropdownChange() {
   );
 
   if (alreadyExists) {
-  
     return;
   }
-  const state = statesData.find((s) => s.name === selectedName);
-  if (state) {
-    const marker = createMarker(state);
+  const item = currentData.find((s) => s.name === selectedName);
+  if (item) {
+    const marker = createMarker(item);
     mapContainer.appendChild(marker);
   }
 }
