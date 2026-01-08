@@ -42,7 +42,7 @@ const continentsData = [
 
   { name: "Africa", top: 62, left: 52 },
   { name: "Antarctica", top: 97, left: 63 },
-  { name: "Asia", top: 45, left: 73 },
+  { name: "Asia", top: 40, left: 73 },
   { name: "Australia", top: 73, left: 85 },
   { name: "Europe", top: 42, left: 53 },
   { name: "North America", top: 35, left: 18 },
